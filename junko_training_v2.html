@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>じゅんこぽんの筋トレ道場</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;700;900&display=swap');
+
+  :root {
+    --bg: #0f0a1a;
+    --surface: #1a1230;
+    --surface2: #221940;
+    --accent: #ff6b9d;
+    --accent2: #c45aef;
+    --accent3: #4ecdc4;
+    --gold: #ffd166;
+    --text: #f0eaff;
+    --muted: #8a7aaa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(196,90,239,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(255,107,157,0.12) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  /* タブナビ */
+  .tab-nav {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    background: var(--surface);
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ヘッダー */
+  .header {
+    text-align: center;
+    padding: 12px 0 16px;
+  }
+
+  .header h1 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ストリーク */
+  .streak-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+  }
+
+  .streak-num {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .streak-label { font-size: 0.75rem; color: var(--muted); }
+
+  .streak-divider {
+    width: 1px;
+    height: 36px;
+    background: rgba(255,255,255,0.1);
+  }
+
+  /* 今日カード */
+  .today-card {
+    background: linear-gradient(135deg, var(--surface), var(--surface2));
+    border: 1px solid rgba(255,107,157,0.3);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .today-label {
+    font-size: 0.68rem;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  .today-day {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .today-type {
+    display: inline-block;
+    background: rgba(255,107,157,0.2);
+    border: 1px solid rgba(255,107,157,0.5);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .today-goal { font-size: 0.78rem; color: var(--muted); }
+
+  /* 週グリッド */
+  .week-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+
+  .week-card h3 { font-size: 0.72rem; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .day-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 7px 2px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    background: var(--surface2);
+    color: var(--muted);
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .day-btn.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    box-shadow: 0 3px 12px rgba(255,107,157,0.4);
+  }
+
+  .day-btn.gym { background: linear-gradient(135deg, #2a1a40, #3a2055); border: 1px solid rgba(196,90,239,0.3); }
+  .day-btn.gym.active { background: linear-gradient(135deg, var(--accent2), #7b2ff7); }
+
+  .day-label { font-size: 0.68rem; font-weight: 700; }
+  .day-icon { font-size: 1rem; }
+  .day-done { font-size: 0.6rem; color: var(--accent3); height: 10px; }
+
+  /* プログレス */
+  .progress-wrap { margin-bottom: 12px; }
+  .progress-bar {
+    background: var(--surface);
+    border-radius: 100px;
+    height: 7px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 100px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-text { font-size: 0.72rem; color: var(--muted); text-align: right; }
+
+  /* メニュー */
+  .section-title {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 900;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .badge {
+    font-size: 0.68rem;
+    background: rgba(78,205,196,0.2);
+    border: 1px solid rgba(78,205,196,0.4);
+    color: var(--accent3);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+  }
+
+  .exercise-card {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .exercise-card:hover { background: var(--surface2); }
+
+  .exercise-card.done {
+    opacity: 0.5;
+    border-left-color: var(--accent3);
+  }
+
+  .ex-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .ex-number {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+
+  .ex-content { flex: 1; }
+
+  .ex-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ex-name { font-weight: 700; font-size: 0.88rem; line-height: 1.3; }
+
+  .done-badge {
+    font-size: 0.65rem;
+    color: var(--accent3);
+    font-weight: 700;
+    display: none;
+  }
+  .exercise-card.done .done-badge { display: block; }
+
+  .ex-detail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 6px 0;
+  }
+
+  .tag {
+    font-size: 0.65rem;
+    padding: 2px 7px;
+    border-radius: 8px;
+    font-weight: 700;
+  }
+
+  .tag-set { background: rgba(255,107,157,0.15); color: var(--accent); }
+  .tag-rep { background: rgba(196,90,239,0.15); color: var(--accent2); }
+  .tag-weight { background: rgba(255,209,102,0.15); color: var(--gold); }
+  .tag-target { background: rgba(78,205,196,0.1); color: var(--accent3); }
+
+  .ex-point { font-size: 0.7rem; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
+
+  /* 重量メモ欄 */
+  .weight-memo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+
+  .weight-memo label { font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
+
+  .weight-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,209,102,0.3);
+    color: var(--gold);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 2px 4px;
+    outline: none;
+    min-width: 0;
+  }
+
+  .weight-input::placeholder { color: rgba(255,209,102,0.3); }
+  .weight-input:focus { border-bottom-color: var(--gold); }
+
+  .weight-unit { font-size: 0.68rem; color: var(--muted); }
+
+  /* 完了 */
+  .all-done {
+    display: none;
+    text-align: center;
+    padding: 24px 16px;
+    animation: popIn 0.5s ease;
+  }
+  .all-done.show { display: block; }
+  .all-done .emoji { font-size: 2.5rem; margin-bottom: 10px; }
+  .all-done h2 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+  }
+  .all-done p { color: var(--muted); font-size: 0.82rem; }
+
+  .reset-btn {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid rgba(138,122,170,0.3);
+    border-radius: 10px;
+    color: var(--muted);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ========== カレンダータブ ========== */
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .cal-nav {
+    background: var(--surface);
+    border: none;
+    color: var(--text);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .cal-nav:hover { background: var(--surface2); }
+
+  .cal-month {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+  }
+
+  .cal-grid {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 8px;
+  }
+
+  .cal-weekday {
+    text-align: center;
+    font-size: 0.65rem;
+    color: var(--muted);
+    font-weight: 700;
+    padding: 4px 0;
+  }
+
+  .cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    position: relative;
+    cursor: default;
+  }
+
+  .cal-day.today {
+    background: rgba(255,107,157,0.2);
+    color: var(--accent);
+    border: 1px solid rgba(255,107,157,0.4);
+  }
+
+  .cal-day.done-day {
+    background: linear-gradient(135deg, rgba(78,205,196,0.2), rgba(196,90,239,0.2));
+    color: var(--text);
+  }
+
+  .cal-day.done-day::after {
+    content: '✓';
+    position: absolute;
+    bottom: 2px;
+    font-size: 0.5rem;
+    color: var(--accent3);
+  }
+
+  .cal-day.other-month { opacity: 0.3; }
+
+  /* 週達成率 */
+  .weekly-stats {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+
+  .weekly-stats h3 {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .week-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 80px;
+    margin-bottom: 6px;
+  }
+
+  .week-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .week-bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    background: linear-gradient(180deg, var(--accent2), var(--accent));
+    transition: height 0.4s ease;
+    min-height: 3px;
+  }
+
+  .week-bar-pct { font-size: 0.58rem; color: var(--muted); }
+  .week-bar-label { font-size: 0.62rem; color: var(--muted); }
+
+  /* 重量履歴タブ */
+  .weight-history {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+
+  .weight-history h3 {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .wh-item {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .wh-item:last-child { border-bottom: none; }
+
+  .wh-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .wh-entries {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .wh-entry {
+    background: rgba(255,209,102,0.1);
+    border: 1px solid rgba(255,209,102,0.2);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.68rem;
+    color: var(--gold);
+  }
+
+  .wh-date { color: var(--muted); }
+
+  .no-data {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    padding: 20px;
+  }
+
+  /* ルール */
+  .rule-card {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px;
+    margin-top: 16px;
+  }
+
+  .rule-card h4 { font-size: 0.72rem; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
+
+  .rule-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 7px;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+
+  .rule-icon { font-size: 0.95rem; flex-shrink: 0; }
+  .rule-text { color: var(--muted); }
+  .rule-text strong { color: var(--text); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    70% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .animate { animation: fadeUp 0.4s ease both; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>💪 じゅんこぽんの筋トレ道場</h1>
+  </div>
+
+  <!-- タブナビ -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('today')">🏋️ 今日</button>
+    <button class="tab-btn" onclick="switchTab('calendar')">📅 記録</button>
+    <button class="tab-btn" onclick="switchTab('weights')">⚖️ 重量</button>
+  </div>
+
+  <!-- ========== 今日タブ ========== -->
+  <div class="tab-content active" id="tab-today">
+
+    <!-- ストリーク -->
+    <div class="streak-bar animate">
+      <div style="text-align:center">
+        <div class="streak-num" id="streakNum">0</div>
+        <div class="streak-label">🔥 連続日数</div>
+      </div>
+      <div class="streak-divider"></div>
+      <div style="text-align:center">
+        <div class="streak-num" id="totalNum">0</div>
+        <div class="streak-label">📊 今月の回数</div>
+      </div>
+      <div class="streak-divider"></div>
+      <div style="text-align:center">
+        <div class="streak-num" id="weekPct">0%</div>
+        <div class="streak-label">今週達成率</div>
+      </div>
+    </div>
+
+    <!-- 今日カード -->
+    <div class="today-card animate">
+      <div class="today-label">TODAY</div>
+      <div class="today-day" id="todayDayName">---</div>
+      <div class="today-type" id="todayType">---</div>
+      <div class="today-goal" id="todayGoal"></div>
+    </div>
+
+    <!-- 週グリッド -->
+    <div class="week-card animate">
+      <h3>📆 週間スケジュール（タップで切り替え）</h3>
+      <div class="week-grid" id="weekGrid"></div>
+    </div>
+
+    <!-- プログレス -->
+    <div class="progress-wrap animate">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-text" id="progressText">0 / 0 完了</div>
+    </div>
+
+    <!-- メニュー -->
+    <div id="menuSection"></div>
+
+    <!-- 完了 -->
+    <div class="all-done" id="allDone">
+      <div class="emoji">🎉✨💪</div>
+      <h2>全メニュー完了！！</h2>
+      <p>さすがじゅんこぽん先生！<br>今日もやりきりました！</p>
+    </div>
+
+    <button class="reset-btn" onclick="resetToday()">↺ 今日のチェックをリセット</button>
+
+    <div class="rule-card">
+      <h4>📏 重量記録ルール</h4>
+      <div class="rule-item">
+        <span class="rule-icon">🏋️</span>
+        <span class="rule-text"><strong>バーベル系</strong> → バー込みの総重量<br>例：バー9.7kg＋プレート → 合計を記録</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">🔵</span>
+        <span class="rule-text"><strong>ダンベル系</strong> → 片手分の重量のみ</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">🔧</span>
+        <span class="rule-text"><strong>マシン系</strong> → マシン表示の数字そのまま</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== カレンダータブ ========== -->
+  <div class="tab-content" id="tab-calendar">
+    <div class="calendar-header">
+      <button class="cal-nav" onclick="changeMonth(-1)">◀</button>
+      <div class="cal-month" id="calMonth"></div>
+      <button class="cal-nav" onclick="changeMonth(1)">▶</button>
+    </div>
+
+    <div class="cal-grid">
+      <div class="cal-weekdays">
+        <div class="cal-weekday" style="color:#ff6b9d">日</div>
+        <div class="cal-weekday">月</div>
+        <div class="cal-weekday">火</div>
+        <div class="cal-weekday">水</div>
+        <div class="cal-weekday">木</div>
+        <div class="cal-weekday">金</div>
+        <div class="cal-weekday" style="color:#4ecdc4">土</div>
+      </div>
+      <div class="cal-days" id="calDays"></div>
+    </div>
+
+    <div class="weekly-stats">
+      <h3>📊 過去8週間の達成率</h3>
+      <div class="week-bars" id="weekBars"></div>
+      <div style="display:flex; gap:6px; justify-content:center" id="weekBarLabels"></div>
+    </div>
+
+    <div id="calDayDetail" style="display:none; background:var(--surface); border-radius:14px; padding:14px; margin-bottom:10px;">
+      <h4 id="calDayDetailTitle" style="font-size:0.82rem; margin-bottom:8px;"></h4>
+      <div id="calDayDetailContent"></div>
+    </div>
+  </div>
+
+  <!-- ========== 重量タブ ========== -->
+  <div class="tab-content" id="tab-weights">
+    <div class="weight-history">
+      <h3>⚖️ 種目別 重量履歴</h3>
+      <div id="weightHistoryContent"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ========== データ定義 ==========
+const scheduleData = {
+  0: {
+    name: '日曜', type: '🏋️ ジム（上半身）', typeClass: 'gym',
+    goal: '振り袖除去・肩の丸み・背中スッキリ', icon: '🏋️', dayType: '上半身',
+    exercises: [
+      { name: 'インクラインベンチプレス', target: '上胸・肩前部', sets: '3セット', reps: '10回', weight: '22.2kg', point: '肩甲骨を寄せる・ゆっくり下ろす' },
+      { name: 'ケーブルトライセプスエクステンション', target: '三頭筋（振り袖！）', sets: '3セット', reps: '12〜15回', weight: '次回記録📝', point: '肘を固定！腕だけ動かす' },
+      { name: 'ラットプルダウン', target: '広背筋・二頭筋', sets: '3セット', reps: '10〜12回', weight: '18.2kg', point: '胸を張って引く・肘を下に' },
+      { name: 'シーテッドロウ', target: '広背筋・菱形筋', sets: '3セット', reps: '10〜12回', weight: '次回記録📝', point: '背中を使う意識・肩をすくめない' },
+      { name: 'サイドレイズ', target: '三角筋（肩の丸み）', sets: '3セット', reps: '12〜15回', weight: '2〜3kg', point: '肘を少し曲げる・真横に上げる' },
+      { name: 'スカルクラッシャー（ダンベル）', target: '三頭筋（振り袖！）', sets: '2〜3セット', reps: '12回', weight: '3〜5kg', point: '肘を固定・ゆっくり下げる' },
+    ]
+  },
+  1: {
+    name: '月曜', type: '🏠 家トレ（下半身＋体幹）', typeClass: '',
+    goal: '下腹凹ませ・内腿スッキリ・お尻引き上げ', icon: '🏠', dayType: '下半身',
+    exercises: [
+      { name: 'プランク ⚠️アプリ起動せよ！', target: 'お腹・体幹・下腹', sets: '3セット', reps: '30秒〜', weight: '自重', point: 'お尻上げすぎない・頭から踵一直線' },
+      { name: 'ヒップヒンジ', target: 'ハムストリングス・お尻', sets: '3セット', reps: '15回', weight: '自重', point: '腰を丸めない・ゆっくり動く' },
+      { name: 'サイドライイングクラムシェル', target: '内腿・お尻外側', sets: '2セット', reps: '左右15回', weight: '自重', point: '腰をひねらない' },
+      { name: 'ダンベルルーマニアンデッドリフト', target: 'ハムストリングス・お尻', sets: '3セット', reps: '12回', weight: '5kg', point: '腰まっすぐ' },
+      { name: 'スタンディングサイドキック', target: 'お尻外側・内腿', sets: '2セット', reps: '左右15回', weight: '自重', point: '上体はまっすぐ' },
+    ]
+  },
+  2: {
+    name: '火曜', type: '🏠 家トレ（上半身＋ウエスト）', typeClass: '',
+    goal: '振り袖除去・ウエスト引き締め・肩の丸み', icon: '🏠', dayType: '上半身',
+    exercises: [
+      { name: 'ウォールプッシュアップ', target: '胸・三頭筋・肩', sets: '2〜3セット', reps: '15回', weight: '自重', point: '体を板のように・肘はやや外向き' },
+      { name: 'トライセプスキックバック', target: '三頭筋（振り袖！）', sets: '3セット', reps: '15回', weight: '5kg', point: '肘を高く固定' },
+      { name: 'ダンベルサイドレイズ', target: '三角筋（肩の丸み）', sets: '3セット', reps: '12〜15回', weight: '2〜3kg', point: 'フォーム優先！' },
+      { name: 'スタンディングツイスト', target: 'ウエスト・腹斜筋', sets: '2セット', reps: '左右20回', weight: '自重', point: '腰からひねる' },
+      { name: 'ダンベルオーバーヘッドトライセプス', target: '三頭筋（振り袖！）', sets: '2〜3セット', reps: '12回', weight: '3〜5kg', point: '肘を頭の横に固定' },
+    ]
+  },
+  3: {
+    name: '水曜', type: '🏠 家トレ（下半身＋体幹）', typeClass: '',
+    goal: '下腹凹ませ・内腿スッキリ・お尻引き上げ', icon: '🏠', dayType: '下半身',
+    exercises: [
+      { name: 'プランク ⚠️アプリ起動せよ！', target: 'お腹・体幹・下腹', sets: '3セット', reps: '30秒〜', weight: '自重', point: 'お尻上げすぎない・頭から踵一直線' },
+      { name: 'ヒップヒンジ', target: 'ハムストリングス・お尻', sets: '3セット', reps: '15回', weight: '自重', point: '腰を丸めない・ゆっくり動く' },
+      { name: 'サイドライイングクラムシェル', target: '内腿・お尻外側', sets: '2セット', reps: '左右15回', weight: '自重', point: '腰をひねらない' },
+      { name: 'ダンベルルーマニアンデッドリフト', target: 'ハムストリングス・お尻', sets: '3セット', reps: '12回', weight: '5kg', point: '腰まっすぐ' },
+      { name: 'スタンディングサイドキック', target: 'お尻外側・内腿', sets: '2セット', reps: '左右15回', weight: '自重', point: '上体はまっすぐ' },
+    ]
+  },
+  4: {
+    name: '木曜', type: '🏠 家トレ（上半身＋ウエスト）', typeClass: '',
+    goal: '振り袖除去・ウエスト引き締め・肩の丸み', icon: '🏠', dayType: '上半身',
+    exercises: [
+      { name: 'ウォールプッシュアップ', target: '胸・三頭筋・肩', sets: '2〜3セット', reps: '15回', weight: '自重', point: '体を板のように・肘はやや外向き' },
+      { name: 'トライセプスキックバック', target: '三頭筋（振り袖！）', sets: '3セット', reps: '15回', weight: '5kg', point: '肘を高く固定' },
+      { name: 'ダンベルサイドレイズ', target: '三角筋（肩の丸み）', sets: '3セット', reps: '12〜15回', weight: '2〜3kg', point: 'フォーム優先！' },
+      { name: 'スタンディングツイスト', target: 'ウエスト・腹斜筋', sets: '2セット', reps: '左右20回', weight: '自重', point: '腰からひねる' },
+      { name: 'ダンベルオーバーヘッドトライセプス', target: '三頭筋（振り袖！）', sets: '2〜3セット', reps: '12回', weight: '3〜5kg', point: '肘を頭の横に固定' },
+    ]
+  },
+  5: {
+    name: '金曜', type: '🏠 家トレ（下半身＋体幹）', typeClass: '',
+    goal: '下腹凹ませ・内腿スッキリ・お尻引き上げ', icon: '🏠', dayType: '下半身',
+    exercises: [
+      { name: 'プランク ⚠️アプリ起動せよ！', target: 'お腹・体幹・下腹', sets: '3セット', reps: '30秒〜', weight: '自重', point: 'お尻上げすぎない・頭から踵一直線' },
+      { name: 'ヒップヒンジ', target: 'ハムストリングス・お尻', sets: '3セット', reps: '15回', weight: '自重', point: '腰を丸めない・ゆっくり動く' },
+      { name: 'サイドライイングクラムシェル', target: '内腿・お尻外側', sets: '2セット', reps: '左右15回', weight: '自重', point: '腰をひねらない' },
+      { name: 'ダンベルルーマニアンデッドリフト', target: 'ハムストリングス・お尻', sets: '3セット', reps: '12回', weight: '5kg', point: '腰まっすぐ' },
+      { name: 'スタンディングサイドキック', target: 'お尻外側・内腿', sets: '2セット', reps: '左右15回', weight: '自重', point: '上体はまっすぐ' },
+    ]
+  },
+  6: {
+    name: '土曜', type: '🏋️ ジム（下半身）', typeClass: 'gym',
+    goal: '内腿スッキリ・お尻引き上げ・前モモ引き締め', icon: '🏋️', dayType: '下半身',
+    exercises: [
+      { name: 'スクワット', target: '前モモ・お尻・内腿', sets: '3セット', reps: '10〜15回', weight: '17.2kg', point: '膝がつま先より出ない・背筋まっすぐ' },
+      { name: 'ヒップスラスト', target: 'お尻・ハムストリングス', sets: '3セット', reps: '10〜15回', weight: '19.7kg', point: 'お尻をしっかり収縮・腰を反らない' },
+      { name: 'ブルガリアンスクワット', target: 'お尻・前モモ・内腿', sets: '2〜3セット', reps: '10回', weight: '9.7kg', point: '前足に重心・バランス注意' },
+      { name: 'ルーマニアンデッドリフト', target: 'ハムストリングス・お尻', sets: '3セット', reps: '10回', weight: '6〜8kg', point: '腰を丸めない・ゆっくり下ろす' },
+      { name: 'レッグプレス（あれば）', target: '前モモ・お尻全体', sets: '3セット', reps: '12回', weight: '試しながら', point: '膝を深く曲げる・足幅広め' },
+    ]
+  }
+};
+
+const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+let currentDay = new Date().getDay();
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+// ========== ストレージ ==========
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function todayKey() { return dateKey(new Date()); }
+
+function getChecked(day) {
+  try { return JSON.parse(localStorage.getItem(`jt_check_${todayKey()}_d${day}`)) || {}; } catch(e) { return {}; }
+}
+
+function saveChecked(day, data) {
+  try { localStorage.setItem(`jt_check_${todayKey()}_d${day}`, JSON.stringify(data)); } catch(e) {}
+}
+
+function getDayRecord(dateStr) {
+  try { return JSON.parse(localStorage.getItem(`jt_done_${dateStr}`)) || null; } catch(e) { return null; }
+}
+
+function saveDayRecord(dateStr, data) {
+  try { localStorage.setItem(`jt_done_${dateStr}`, JSON.stringify(data)); } catch(e) {}
+}
+
+function getWeightMemo(exName, dateStr) {
+  try { return localStorage.getItem(`jt_weight_${exName}_${dateStr}`) || ''; } catch(e) { return ''; }
+}
+
+function saveWeightMemo(exName, dateStr, val) {
+  try { localStorage.setItem(`jt_weight_${exName}_${dateStr}`, val); } catch(e) {}
+}
+
+function getAllWeightHistory(exName) {
+  const results = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(`jt_weight_${exName}_`)) {
+        const dateStr = k.replace(`jt_weight_${exName}_`, '');
+        const val = localStorage.getItem(k);
+        if (val) results.push({ date: dateStr, val });
+      }
+    }
+  } catch(e) {}
+  return results.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+// ========== 統計 ==========
+function calcStreak() {
+  let streak = 0;
+  const d = new Date();
+  // 今日が完了してたらカウント、してなければ昨日から
+  const todayDone = getDayRecord(dateKey(d));
+  if (!todayDone) d.setDate(d.getDate() - 1);
+  
+  for (let i = 0; i < 365; i++) {
+    const rec = getDayRecord(dateKey(d));
+    if (rec && rec.completed) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else break;
+  }
+  return streak;
+}
+
+function calcMonthCount() {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  let count = 0;
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  for (let i = 1; i <= daysInMonth; i++) {
+    const d = new Date(y, m, i);
+    const rec = getDayRecord(dateKey(d));
+    if (rec && rec.completed) count++;
+  }
+  return count;
+}
+
+function calcWeekPct() {
+  const now = new Date();
+  const dow = now.getDay();
+  let done = 0, total = 0;
+  for (let i = 0; i <= dow; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - dow + i);
+    total++;
+    const rec = getDayRecord(dateKey(d));
+    if (rec && rec.completed) done++;
+  }
+  return total > 0 ? Math.round(done / total * 100) : 0;
+}
+
+function calcWeeklyStats() {
+  const now = new Date();
+  const results = [];
+  for (let w = 7; w >= 0; w--) {
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay() - w * 7);
+    let done = 0;
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(weekStart);
+      day.setDate(weekStart.getDate() + d);
+      if (day > now) break;
+      const rec = getDayRecord(dateKey(day));
+      if (rec && rec.completed) done++;
+    }
+    const daysInWeek = Math.min(7, Math.floor((now - weekStart) / 86400000) + 1);
+    results.push({ pct: daysInWeek > 0 ? Math.round(done / daysInWeek * 100) : 0, label: `${weekStart.getMonth()+1}/${weekStart.getDate()}` });
+  }
+  return results;
+}
+
+// ========== タブ ==========
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  event.target.classList.add('active');
+
+  if (tab === 'calendar') renderCalendar();
+  if (tab === 'weights') renderWeightHistory();
+}
+
+// ========== 今日タブ ==========
+function buildWeekGrid() {
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+  dayNames.forEach((name, i) => {
+    const d = new Date();
+    const diff = i - d.getDay();
+    const targetDate = new Date(d);
+    targetDate.setDate(d.getDate() + diff);
+    const rec = getDayRecord(dateKey(targetDate));
+    const isDone = rec && rec.completed;
+
+    const btn = document.createElement('button');
+    btn.className = 'day-btn' + (scheduleData[i].typeClass === 'gym' ? ' gym' : '') + (i === currentDay ? ' active' : '');
+    btn.innerHTML = `<span class="day-label">${name}</span><span class="day-icon">${scheduleData[i].icon}</span><span class="day-done">${isDone ? '✓' : ''}</span>`;
+    btn.onclick = () => switchDay(i);
+    grid.appendChild(btn);
+  });
+}
+
+function switchDay(day) {
+  currentDay = day;
+  document.querySelectorAll('.day-btn').forEach((btn, i) => btn.classList.toggle('active', i === day));
+  const data = scheduleData[day];
+  document.getElementById('todayDayName').textContent = data.name;
+  document.getElementById('todayType').textContent = data.type;
+  document.getElementById('todayGoal').textContent = '🎯 ' + data.goal;
+  renderMenu();
+}
+
+function renderMenu() {
+  const data = scheduleData[currentDay];
+  const checked = getChecked(currentDay);
+  const section = document.getElementById('menuSection');
+  const isToday = currentDay === new Date().getDay();
+  const dateStr = isToday ? todayKey() : '';
+
+  section.innerHTML = `<div class="section-title animate">今日のメニュー <span class="badge">${data.exercises.length}種目</span></div>`;
+
+  const colors = ['var(--accent)', 'var(--accent2)', 'var(--accent3)', 'var(--gold)', 'var(--accent)', 'var(--accent2)'];
+
+  data.exercises.forEach((ex, i) => {
+    const isDone = checked[i];
+    const savedWeight = dateStr ? getWeightMemo(ex.name, dateStr) : '';
+
+    const card = document.createElement('div');
+    card.className = 'exercise-card animate' + (isDone ? ' done' : '');
+    card.style.borderLeftColor = isDone ? 'var(--accent3)' : colors[i % colors.length];
+    card.style.animationDelay = `${i * 0.05}s`;
+
+    card.innerHTML = `
+      <div class="ex-top">
+        <div class="ex-number">${i+1}</div>
+        <div class="ex-content">
+          <div class="ex-header">
+            <div class="ex-name">${ex.name}</div>
+            <span class="done-badge">✓ 完了!</span>
+          </div>
+          <div class="ex-detail">
+            <span class="tag tag-set">${ex.sets}</span>
+            <span class="tag tag-rep">${ex.reps}</span>
+            <span class="tag tag-weight">⚖️ ${ex.weight}</span>
+            <span class="tag tag-target">${ex.target}</span>
+          </div>
+          <div class="ex-point">💡 ${ex.point}</div>
+        </div>
+      </div>
+      <div class="weight-memo" onclick="event.stopPropagation()">
+        <label>📝 今日の重量：</label>
+        <input type="text" class="weight-input" placeholder="${ex.weight}" value="${savedWeight}" 
+          data-exname="${ex.name.replace(/"/g,'')}"
+          onchange="saveWeight(this)"
+          oninput="saveWeight(this)">
+        <span class="weight-unit">kg</span>
+      </div>
+    `;
+
+    card.addEventListener('click', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      toggleItem(i);
+    });
+    section.appendChild(card);
+  });
+
+  updateProgress(checked, data.exercises.length);
+}
+
+function saveWeight(input) {
+  const exName = input.dataset.exname;
+  const val = input.value.trim();
+  if (val) saveWeightMemo(exName, todayKey(), val);
+}
+
+function toggleItem(idx) {
+  const checked = getChecked(currentDay);
+  checked[idx] = !checked[idx];
+  saveChecked(currentDay, checked);
+
+  const data = scheduleData[currentDay];
+  const total = data.exercises.length;
+  const doneCount = Object.values(checked).filter(Boolean).length;
+
+  // 今日のデータとして保存
+  if (currentDay === new Date().getDay()) {
+    saveDayRecord(todayKey(), {
+      completed: doneCount === total,
+      doneCount,
+      total,
+      dayOfWeek: currentDay
+    });
+  }
+
+  renderMenu();
+  buildWeekGrid();
+  updateStats();
+}
+
+function updateProgress(checked, total) {
+  const done = Object.values(checked).filter(Boolean).length;
+  const pct = total > 0 ? (done / total * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done} / ${total} 完了`;
+  document.getElementById('allDone').classList.toggle('show', done === total && total > 0);
+}
+
+function updateStats() {
+  document.getElementById('streakNum').textContent = calcStreak();
+  document.getElementById('totalNum').textContent = calcMonthCount();
+  document.getElementById('weekPct').textContent = calcWeekPct() + '%';
+}
+
+function resetToday() {
+  if (confirm('今日のチェックをリセットしますか？')) {
+    localStorage.removeItem(`jt_check_${todayKey()}_d${currentDay}`);
+    renderMenu();
+  }
+}
+
+// ========== カレンダータブ ==========
+function renderCalendar() {
+  const y = calYear, m = calMonth;
+  document.getElementById('calMonth').textContent = `${y}年${m+1}月`;
+
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const today = new Date();
+
+  const container = document.getElementById('calDays');
+  container.innerHTML = '';
+
+  // 前月の空白
+  for (let i = 0; i < firstDay; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-day other-month';
+    const prevDays = new Date(y, m, 0).getDate();
+    cell.textContent = prevDays - firstDay + i + 1;
+    container.appendChild(cell);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(y, m, d);
+    const dStr = dateKey(date);
+    const rec = getDayRecord(dStr);
+    const isToday = date.toDateString() === today.toDateString();
+
+    const cell = document.createElement('div');
+    cell.className = 'cal-day' + (isToday ? ' today' : '') + (rec && rec.completed ? ' done-day' : '');
+    cell.textContent = d;
+    cell.onclick = () => showCalDayDetail(dStr, rec);
+    container.appendChild(cell);
+  }
+
+  // 週間グラフ
+  renderWeekBars();
+}
+
+function showCalDayDetail(dateStr, rec) {
+  const detail = document.getElementById('calDayDetail');
+  const title = document.getElementById('calDayDetailTitle');
+  const content = document.getElementById('calDayDetailContent');
+
+  if (!rec) {
+    detail.style.display = 'none';
+    return;
+  }
+
+  detail.style.display = 'block';
+  title.textContent = `${dateStr} の記録`;
+  content.innerHTML = rec.completed
+    ? `<div style="color:var(--accent3); font-size:0.85rem">✓ 全${rec.total}種目完了！</div>`
+    : `<div style="color:var(--muted); font-size:0.82rem">${rec.doneCount} / ${rec.total} 種目完了</div>`;
+}
+
+function renderWeekBars() {
+  const stats = calcWeeklyStats();
+  const barsEl = document.getElementById('weekBars');
+  const labelsEl = document.getElementById('weekBarLabels');
+  barsEl.innerHTML = '';
+  labelsEl.innerHTML = '';
+
+  stats.forEach(s => {
+    const wrap = document.createElement('div');
+    wrap.className = 'week-bar-wrap';
+    wrap.innerHTML = `
+      <div class="week-bar-pct">${s.pct}%</div>
+      <div class="week-bar" style="height:${Math.max(3, s.pct * 0.6)}px"></div>
+    `;
+    barsEl.appendChild(wrap);
+
+    const lbl = document.createElement('div');
+    lbl.className = 'week-bar-label';
+    lbl.style.flex = '1';
+    lbl.style.textAlign = 'center';
+    lbl.textContent = s.label;
+    labelsEl.appendChild(lbl);
+  });
+}
+
+function changeMonth(delta) {
+  calMonth += delta;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+// ========== 重量タブ ==========
+function renderWeightHistory() {
+  const container = document.getElementById('weightHistoryContent');
+  container.innerHTML = '';
+
+  // 全種目を収集
+  const allExercises = [];
+  Object.values(scheduleData).forEach(day => {
+    day.exercises.forEach(ex => {
+      if (!allExercises.includes(ex.name)) allExercises.push(ex.name);
+    });
+  });
+
+  let hasAny = false;
+
+  allExercises.forEach(exName => {
+    const history = getAllWeightHistory(exName);
+    if (history.length === 0) return;
+    hasAny = true;
+
+    const item = document.createElement('div');
+    item.className = 'wh-item';
+    item.innerHTML = `
+      <div class="wh-name">${exName}</div>
+      <div class="wh-entries">
+        ${history.slice(0, 10).map(h => `<div class="wh-entry"><span class="wh-date">${h.date}</span> ${h.val}kg</div>`).join('')}
+      </div>
+    `;
+    container.appendChild(item);
+  });
+
+  if (!hasAny) {
+    container.innerHTML = '<div class="no-data">まだ重量メモがありません😊<br>「今日」タブで種目ごとに<br>重量を入力してみてください！</div>';
+  }
+}
+
+// ========== 初期化 ==========
+window.onload = () => {
+  const today = new Date().getDay();
+  currentDay = today;
+  buildWeekGrid();
+  switchDay(today);
+  updateStats();
+};
+</script>
+</body>
+</html>
