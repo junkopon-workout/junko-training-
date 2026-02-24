@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>じゅんこぽんの筋トレ道場</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;700;900&display=swap');
+
+  :root {
+    --bg: #0f0a1a;
+    --surface: #1a1230;
+    --surface2: #221940;
+    --accent: #ff6b9d;
+    --accent2: #c45aef;
+    --accent3: #4ecdc4;
+    --gold: #ffd166;
+    --text: #f0eaff;
+    --muted: #8a7aaa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* 背景のきらきら */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(196,90,239,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(255,107,157,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(78,205,196,0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px 16px;
+  }
+
+  /* ヘッダー */
+  .header {
+    text-align: center;
+    padding: 20px 0 24px;
+    animation: fadeDown 0.6s ease;
+  }
+
+  .header h1 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+
+  .header .subtitle {
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
+  /* 今日カード */
+  .today-card {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid rgba(255,107,157,0.3);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.5s ease 0.1s both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .today-card::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    border-radius: 21px;
+    z-index: -1;
+    opacity: 0.4;
+  }
+
+  .today-label {
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .today-day {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .today-type {
+    display: inline-block;
+    background: rgba(255,107,157,0.2);
+    border: 1px solid rgba(255,107,157,0.5);
+    color: var(--accent);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .today-goal {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* 週間カレンダー */
+  .week-card {
+    background: var(--surface);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.5s ease 0.2s both;
+  }
+
+  .week-card h3 {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+
+  .day-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: none;
+    background: var(--surface2);
+    color: var(--muted);
+    transition: all 0.2s ease;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .day-btn:hover { transform: scale(1.05); }
+
+  .day-btn.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    box-shadow: 0 4px 15px rgba(255,107,157,0.4);
+  }
+
+  .day-btn.gym {
+    background: linear-gradient(135deg, #2a1a40, #3a2055);
+    border: 1px solid rgba(196,90,239,0.4);
+  }
+  .day-btn.gym.active {
+    background: linear-gradient(135deg, var(--accent2), #7b2ff7);
+    box-shadow: 0 4px 15px rgba(196,90,239,0.4);
+  }
+
+  .day-label { font-size: 0.72rem; font-weight: 700; }
+  .day-icon { font-size: 1.1rem; }
+  .day-type { font-size: 0.55rem; line-height: 1.2; text-align: center; }
+
+  /* メニューリスト */
+  .menu-section {
+    animation: fadeUp 0.5s ease 0.3s both;
+  }
+
+  .section-title {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 1.0rem;
+    font-weight: 900;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title .badge {
+    font-size: 0.72rem;
+    background: rgba(78,205,196,0.2);
+    border: 1px solid rgba(78,205,196,0.4);
+    color: var(--accent3);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+  }
+
+  .exercise-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .exercise-card:hover {
+    background: var(--surface2);
+    transform: translateX(4px);
+  }
+
+  .exercise-card.done {
+    opacity: 0.5;
+    border-left-color: var(--accent3);
+  }
+
+  .exercise-card.done::after {
+    content: '✓ 完了!';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent3);
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .ex-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+
+  .ex-content { flex: 1; }
+
+  .ex-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .ex-detail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .tag {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+  }
+
+  .tag-set { background: rgba(255,107,157,0.15); color: var(--accent); }
+  .tag-rep { background: rgba(196,90,239,0.15); color: var(--accent2); }
+  .tag-weight { background: rgba(255,209,102,0.15); color: var(--gold); }
+  .tag-target { background: rgba(78,205,196,0.1); color: var(--accent3); }
+
+  .ex-point {
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* プログレス */
+  .progress-bar {
+    background: var(--surface);
+    border-radius: 100px;
+    height: 8px;
+    margin: 16px 0;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease 0.4s both;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 100px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  .progress-text {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: right;
+    margin-top: -8px;
+    margin-bottom: 12px;
+    animation: fadeUp 0.5s ease 0.4s both;
+  }
+
+  /* リセットボタン */
+  .reset-btn {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid rgba(138,122,170,0.3);
+    border-radius: 12px;
+    color: var(--muted);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    animation: fadeUp 0.5s ease 0.5s both;
+  }
+  .reset-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* 完了メッセージ */
+  .all-done {
+    display: none;
+    text-align: center;
+    padding: 30px 20px;
+    animation: popIn 0.5s ease;
+  }
+
+  .all-done.show { display: block; }
+
+  .all-done .emoji { font-size: 3rem; margin-bottom: 12px; }
+  .all-done h2 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .all-done p { color: var(--muted); font-size: 0.85rem; }
+
+  /* ルール */
+  .rule-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 16px;
+    margin-top: 20px;
+    animation: fadeUp 0.5s ease 0.6s both;
+  }
+
+  .rule-card h4 {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  .rule-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+
+  .rule-icon { font-size: 1rem; flex-shrink: 0; }
+  .rule-text { color: var(--muted); }
+  .rule-text strong { color: var(--text); }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    70% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>💪 じゅんこぽんの筋トレ道場</h1>
+    <div class="subtitle">開いたその瞬間がスタート！</div>
+  </div>
+
+  <!-- 今日カード -->
+  <div class="today-card" id="todayCard">
+    <div class="today-label">TODAY</div>
+    <div class="today-day" id="todayDayName">---</div>
+    <div class="today-type" id="todayType">---</div>
+    <div class="today-goal" id="todayGoal">読み込み中...</div>
+  </div>
+
+  <!-- 週間グリッド -->
+  <div class="week-card">
+    <h3>📆 週間スケジュール</h3>
+    <div class="week-grid" id="weekGrid"></div>
+  </div>
+
+  <!-- プログレス -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div class="progress-text" id="progressText">0 / 0 完了</div>
+
+  <!-- メニュー -->
+  <div class="menu-section" id="menuSection"></div>
+
+  <!-- 完了！ -->
+  <div class="all-done" id="allDone">
+    <div class="emoji">🎉✨💪</div>
+    <h2>全メニュー完了！！</h2>
+    <p>さすがじゅんこぽん先生！<br>今日もやりきりました！</p>
+  </div>
+
+  <!-- リセット -->
+  <button class="reset-btn" id="resetBtn" onclick="resetToday()">↺ 今日のチェックをリセット</button>
+
+  <!-- 記録ルール -->
+  <div class="rule-card">
+    <h4>📏 重量記録ルール</h4>
+    <div class="rule-item">
+      <span class="rule-icon">🏋️</span>
+      <span class="rule-text"><strong>バーベル系</strong> → バー込みの総重量<br>例：バー9.7kg＋プレート → 合計を記録</span>
+    </div>
+    <div class="rule-item">
+      <span class="rule-icon">🔵</span>
+      <span class="rule-text"><strong>ダンベル系</strong> → 片手分の重量のみ<br>例：両手に3kg → 「3kg」と記録</span>
+    </div>
+    <div class="rule-item">
+      <span class="rule-icon">🔧</span>
+      <span class="rule-text"><strong>マシン系</strong> → マシン表示の数字そのまま<br>例：ピンが「18」→「18kg」と記録</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const scheduleData = {
+  0: { // 日曜
+    name: '日曜',
+    type: '🏋️ ジム（上半身）',
+    typeClass: 'gym',
+    goal: '振り袖除去・肩の丸み・背中スッキリ',
+    icon: '🏋️',
+    dayType: '上半身',
+    exercises: [
+      { name: 'インクラインベンチプレス', target: '上胸・肩前部', sets: '3セット', reps: '10回', weight: '22.2kg', point: '肩甲骨を寄せる・ゆっくり下ろす' },
+      { name: 'ケーブルトライセプスエクステンション', target: '三頭筋（振り袖！）', sets: '3セット', reps: '12〜15回', weight: '次回記録📝', point: '肘を固定！腕だけ動かす' },
+      { name: 'ラットプルダウン', target: '広背筋・二頭筋', sets: '3セット', reps: '10〜12回', weight: '18.2kg', point: '胸を張って引く・肘を下に' },
+      { name: 'シーテッドロウ', target: '広背筋・菱形筋', sets: '3セット', reps: '10〜12回', weight: '次回記録📝', point: '背中を使う意識・肩をすくめない' },
+      { name: 'サイドレイズ', target: '三角筋（肩の丸み）', sets: '3セット', reps: '12〜15回', weight: '2〜3kg（フォーム優先）', point: '肘を少し曲げる・真横に上げる' },
+      { name: 'スカルクラッシャー（ダンベル）', target: '三頭筋（振り袖！）', sets: '2〜3セット', reps: '12回', weight: '3〜5kg', point: '肘を固定・ゆっくり下げる' },
+    ]
+  },
+  1: { // 月曜
+    name: '月曜',
+    type: '🏠 家トレ（下半身＋体幹）',
+    typeClass: '',
+    goal: '下腹凹ませ・内腿スッキリ・お尻引き上げ',
+    icon: '🏠',
+    dayType: '下半身',
+    exercises: [
+      { name: 'プランク ⚠️アプリ起動せよ！', target: 'お腹・体幹・下腹', sets: '3セット', reps: '30秒〜（アプリに従う）', weight: '自重', point: 'お尻上げすぎない・頭から踵一直線' },
+      { name: 'ヒップヒンジ（道具なし）', target: 'ハムストリングス・お尻', sets: '3セット', reps: '15回', weight: '自重', point: '腰を丸めない・ゆっくり動く' },
+      { name: 'サイドライイングクラムシェル', target: '内腿・お尻外側', sets: '2セット', reps: '左右15回', weight: '自重', point: '腰をひねらない・貝が開く動き' },
+      { name: 'ダンベルルーマニアンデッドリフト', target: 'ハムストリングス・お尻', sets: '3セット', reps: '12回', weight: '5kg', point: '腰まっすぐ' },
+      { name: 'スタンディングサイドキック', target: 'お尻外側・内腿', sets: '2セット', reps: '左右15回', weight: '自重', point: '上体はまっすぐ・ゆっくり動く' },
+    ]
+  },
+  2: { // 火曜
+    name: '火曜',
+    type: '🏠 家トレ（上半身＋ウエスト）',
+    typeClass: '',
+    goal: '振り袖除去・ウエスト引き締め・肩の丸み',
+    icon: '🏠',
+    dayType: '上半身',
+    exercises: [
+      { name: 'ウォールプッシュアップ（壁腕立て）', target: '胸・三頭筋・肩', sets: '2〜3セット', reps: '15回', weight: '自重', point: '体を板のように・肘はやや外向き' },
+      { name: 'トライセプスキックバック', target: '三頭筋（振り袖！）', sets: '3セット', reps: '15回', weight: '5kg', point: '肘を高く固定' },
+      { name: 'ダンベルサイドレイズ', target: '三角筋（肩の丸み）', sets: '3セット', reps: '12〜15回', weight: '2〜3kg（フォーム優先）', point: 'フォーム優先！' },
+      { name: 'スタンディングツイスト', target: 'ウエスト・腹斜筋', sets: '2セット', reps: '左右20回', weight: '自重', point: '腰からひねる・膝は正面向き' },
+      { name: 'ダンベルオーバーヘッドトライセプス', target: '三頭筋（振り袖！）', sets: '2〜3セット', reps: '12回', weight: '3〜5kg', point: '肘を頭の横に固定' },
+    ]
+  },
+  3: { // 水曜
+    name: '水曜',
+    type: '🏠 家トレ（下半身＋体幹）',
+    typeClass: '',
+    goal: '下腹凹ませ・内腿スッキリ・お尻引き上げ',
+    icon: '🏠',
+    dayType: '下半身',
+    exercises: [
+      { name: 'プランク ⚠️アプリ起動せよ！', target: 'お腹・体幹・下腹', sets: '3セット', reps: '30秒〜（アプリに従う）', weight: '自重', point: 'お尻上げすぎない・頭から踵一直線' },
+      { name: 'ヒップヒンジ（道具なし）', target: 'ハムストリングス・お尻', sets: '3セット', reps: '15回', weight: '自重', point: '腰を丸めない・ゆっくり動く' },
+      { name: 'サイドライイングクラムシェル', target: '内腿・お尻外側', sets: '2セット', reps: '左右15回', weight: '自重', point: '腰をひねらない・貝が開く動き' },
+      { name: 'ダンベルルーマニアンデッドリフト', target: 'ハムストリングス・お尻', sets: '3セット', reps: '12回', weight: '5kg', point: '腰まっすぐ' },
+      { name: 'スタンディングサイドキック', target: 'お尻外側・内腿', sets: '2セット', reps: '左右15回', weight: '自重', point: '上体はまっすぐ・ゆっくり動く' },
+    ]
+  },
+  4: { // 木曜
+    name: '木曜',
+    type: '🏠 家トレ（上半身＋ウエスト）',
+    typeClass: '',
+    goal: '振り袖除去・ウエスト引き締め・肩の丸み',
+    icon: '🏠',
+    dayType: '上半身',
+    exercises: [
+      { name: 'ウォールプッシュアップ（壁腕立て）', target: '胸・三頭筋・肩', sets: '2〜3セット', reps: '15回', weight: '自重', point: '体を板のように・肘はやや外向き' },
+      { name: 'トライセプスキックバック', target: '三頭筋（振り袖！）', sets: '3セット', reps: '15回', weight: '5kg', point: '肘を高く固定' },
+      { name: 'ダンベルサイドレイズ', target: '三角筋（肩の丸み）', sets: '3セット', reps: '12〜15回', weight: '2〜3kg（フォーム優先）', point: 'フォーム優先！' },
+      { name: 'スタンディングツイスト', target: 'ウエスト・腹斜筋', sets: '2セット', reps: '左右20回', weight: '自重', point: '腰からひねる・膝は正面向き' },
+      { name: 'ダンベルオーバーヘッドトライセプス', target: '三頭筋（振り袖！）', sets: '2〜3セット', reps: '12回', weight: '3〜5kg', point: '肘を頭の横に固定' },
+    ]
+  },
+  5: { // 金曜
+    name: '金曜',
+    type: '🏠 家トレ（下半身＋体幹）',
+    typeClass: '',
+    goal: '下腹凹ませ・内腿スッキリ・お尻引き上げ',
+    icon: '🏠',
+    dayType: '下半身',
+    exercises: [
+      { name: 'プランク ⚠️アプリ起動せよ！', target: 'お腹・体幹・下腹', sets: '3セット', reps: '30秒〜（アプリに従う）', weight: '自重', point: 'お尻上げすぎない・頭から踵一直線' },
+      { name: 'ヒップヒンジ（道具なし）', target: 'ハムストリングス・お尻', sets: '3セット', reps: '15回', weight: '自重', point: '腰を丸めない・ゆっくり動く' },
+      { name: 'サイドライイングクラムシェル', target: '内腿・お尻外側', sets: '2セット', reps: '左右15回', weight: '自重', point: '腰をひねらない・貝が開く動き' },
+      { name: 'ダンベルルーマニアンデッドリフト', target: 'ハムストリングス・お尻', sets: '3セット', reps: '12回', weight: '5kg', point: '腰まっすぐ' },
+      { name: 'スタンディングサイドキック', target: 'お尻外側・内腿', sets: '2セット', reps: '左右15回', weight: '自重', point: '上体はまっすぐ・ゆっくり動く' },
+    ]
+  },
+  6: { // 土曜
+    name: '土曜',
+    type: '🏋️ ジム（下半身）',
+    typeClass: 'gym',
+    goal: '内腿スッキリ・お尻引き上げ・前モモ引き締め',
+    icon: '🏋️',
+    dayType: '下半身',
+    exercises: [
+      { name: 'スクワット', target: '前モモ・お尻・内腿', sets: '3セット', reps: '10〜15回', weight: '17.2kg', point: '膝がつま先より出ない・背筋まっすぐ' },
+      { name: 'ヒップスラスト', target: 'お尻・ハムストリングス', sets: '3セット', reps: '10〜15回', weight: '19.7kg', point: 'お尻をしっかり収縮・腰を反らない' },
+      { name: 'ブルガリアンスクワット', target: 'お尻・前モモ・内腿', sets: '2〜3セット', reps: '10回', weight: '9.7kg', point: '前足に重心・バランス注意' },
+      { name: 'ルーマニアンデッドリフト', target: 'ハムストリングス・お尻', sets: '3セット', reps: '10回', weight: '6〜8kg（重量アップ中）', point: '腰を丸めない・ゆっくり下ろす' },
+      { name: 'レッグプレス（あれば）', target: '前モモ・お尻全体', sets: '3セット', reps: '12回', weight: '試しながら', point: '膝を深く曲げる・足幅広めで内腿も' },
+    ]
+  }
+};
+
+const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+let currentDay;
+let checkedItems = {};
+
+function getStorageKey(day) {
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+  return `junko_workout_${dateStr}_day${day}`;
+}
+
+function loadChecked(day) {
+  try {
+    const saved = localStorage.getItem(getStorageKey(day));
+    return saved ? JSON.parse(saved) : {};
+  } catch(e) { return {}; }
+}
+
+function saveChecked(day, data) {
+  try {
+    localStorage.setItem(getStorageKey(day), JSON.stringify(data));
+  } catch(e) {}
+}
+
+function buildWeekGrid() {
+  const today = new Date().getDay();
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+
+  dayNames.forEach((name, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'day-btn' + (scheduleData[i].typeClass === 'gym' ? ' gym' : '') + (i === today ? ' active' : '');
+    btn.innerHTML = `<span class="day-label">${name}</span><span class="day-icon">${scheduleData[i].icon}</span><span class="day-type">${scheduleData[i].dayType}</span>`;
+    btn.onclick = () => switchDay(i);
+    grid.appendChild(btn);
+  });
+}
+
+function switchDay(day) {
+  currentDay = day;
+
+  // ボタンのactive更新
+  document.querySelectorAll('.day-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === day);
+  });
+
+  const data = scheduleData[day];
+
+  // today card更新
+  document.getElementById('todayDayName').textContent = data.name;
+  document.getElementById('todayType').textContent = data.type;
+  document.getElementById('todayGoal').textContent = '🎯 ' + data.goal;
+
+  // チェック状態ロード
+  checkedItems = loadChecked(day);
+
+  renderMenu();
+}
+
+function renderMenu() {
+  const data = scheduleData[currentDay];
+  const section = document.getElementById('menuSection');
+  section.innerHTML = `<div class="section-title">今日のメニュー <span class="badge">${data.exercises.length}種目</span></div>`;
+
+  const borderColors = ['var(--accent)', 'var(--accent2)', 'var(--accent3)', 'var(--gold)', 'var(--accent)', 'var(--accent2)'];
+
+  data.exercises.forEach((ex, i) => {
+    const isDone = checkedItems[i];
+    const card = document.createElement('div');
+    card.className = 'exercise-card' + (isDone ? ' done' : '');
+    card.style.borderLeftColor = isDone ? 'var(--accent3)' : borderColors[i % borderColors.length];
+    card.innerHTML = `
+      <div class="ex-number">${i+1}</div>
+      <div class="ex-content">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-detail">
+          <span class="tag tag-set">${ex.sets}</span>
+          <span class="tag tag-rep">${ex.reps}</span>
+          <span class="tag tag-weight">⚖️ ${ex.weight}</span>
+          <span class="tag tag-target">${ex.target}</span>
+        </div>
+        <div class="ex-point">💡 ${ex.point}</div>
+      </div>
+    `;
+    card.onclick = () => toggleItem(i);
+    section.appendChild(card);
+  });
+
+  updateProgress();
+}
+
+function toggleItem(idx) {
+  checkedItems[idx] = !checkedItems[idx];
+  saveChecked(currentDay, checkedItems);
+  renderMenu();
+}
+
+function updateProgress() {
+  const data = scheduleData[currentDay];
+  const total = data.exercises.length;
+  const done = Object.values(checkedItems).filter(Boolean).length;
+  const pct = total > 0 ? (done / total * 100) : 0;
+
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done} / ${total} 完了`;
+
+  const allDone = document.getElementById('allDone');
+  if (done === total && total > 0) {
+    allDone.classList.add('show');
+    // 紙吹雪的な演出は省略、メッセージで十分
+  } else {
+    allDone.classList.remove('show');
+  }
+}
+
+function resetToday() {
+  if (confirm('今日のチェックをリセットしますか？')) {
+    checkedItems = {};
+    saveChecked(currentDay, checkedItems);
+    renderMenu();
+  }
+}
+
+// 初期化
+window.onload = () => {
+  const today = new Date().getDay();
+  buildWeekGrid();
+  switchDay(today);
+};
+</script>
+</body>
+</html>
